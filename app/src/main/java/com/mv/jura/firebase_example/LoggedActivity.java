@@ -25,12 +25,21 @@ public class LoggedActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_logged);
         ButterKnife.bind(this);
-        items.add(new Item("hello"));
-        items.add(new Item("world"));
-        items.add(new Item("martin"));
-        items.add(new Item("zuzana"));
+        items = populateProfiles();
+
         run();
     }
+
+    private ArrayList<Item> populateProfiles() {
+        items = new ArrayList<>();
+        //tu sa naplni items tolkokrat kolko bude vedla seba profilov
+        items.add(new Item());
+        items.add(new Item());
+        items.add(new Item());
+        items.add(new Item());
+        return items;
+    }
+
     public void run() {
         mAdapter = new ListAdapter(getApplicationContext(), items);
         mRecyclerView.setAdapter(mAdapter);

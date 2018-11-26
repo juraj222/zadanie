@@ -11,11 +11,10 @@ public class Item {
     URI videoUrl;
     boolean isProfile;
 
-    public Item(String name) {
-        this.name = name;
+    public Item() {
     }
 
-    public Item(String name, String date, String registrationDate, String postCount, URI imageUrl, URI videoUrl, boolean isProfile) {
+    public Item(String name, String registrationDate, String date,  String postCount, URI imageUrl, URI videoUrl, boolean isProfile) {
         this.name = name;
         this.date = date;
         this.registrationDate = registrationDate;

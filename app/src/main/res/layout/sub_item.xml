@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -15,16 +16,40 @@
             android:orientation="vertical">
 
             <TextView
+                android:id="@+id/textView3"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Profil používateľa:"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+
+            <TextView
                 android:id="@+id/textViewProfileName"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="ProfileName" />
 
             <TextView
+                android:id="@+id/textView4"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Zaregistrovaný:"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+
+            <TextView
                 android:id="@+id/textViewProfileDate"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="ProfileDate" />
+
+            <TextView
+                android:id="@+id/textView5"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Počet príspevkov:"
+                android:textSize="18sp"
+                android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/textViewProfilePostCount"
@@ -38,15 +63,28 @@
         android:id="@+id/relativeLayoutPost"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
+            <!-- tento ImageView sa zmeni na obr alebo video -->
+            <ImageView
+                android:id="@+id/imageView"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                app:srcCompat="@drawable/ic_launcher_background" />
 
-    </RelativeLayout>
+            <TextView
+                android:id="@+id/textViewPostName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_above="@+id/textViewPostDate"
+                android:text="ProfileName"
+                android:textSize="18sp" />
 
-    <TextView
-        android:id="@+id/itemTextView"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="Restaurant Name"
-        android:textColor="@color/colorPrimary"
-        android:textSize="20dp"
-        android:textStyle="bold" />
-</FrameLayout>
+            <TextView
+                android:id="@+id/textViewPostDate"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                android:text="PostDate"
+                android:textSize="30sp" />
+        </RelativeLayout>
+
+    </FrameLayout>

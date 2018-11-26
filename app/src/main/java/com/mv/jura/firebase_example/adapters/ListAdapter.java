@@ -50,17 +50,16 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder>{
             super(itemView);
             mContext = itemView.getContext();
             SubListAdapter mAdapter;
-            ArrayList<Item> items = new ArrayList<>();
-            items.add(new Item("hello"));
-            items.add(new Item("world"));
-            items.add(new Item("martin"));
-            items.add(new Item("zuzana"));
+            ArrayList<Item> items;
+            items = populateItems();
+
 
             RecyclerView mRecyclerView = itemView.findViewById(R.id.subRecyclerView);
 
             mAdapter = new SubListAdapter(mContext, items);
             mRecyclerView.setAdapter(mAdapter);
             RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(mContext);
+            layoutManager.scrollToPosition(1); // tu mozno bude chyba, ak nie je ziaden prispevok
             mRecyclerView.setLayoutManager(layoutManager);
             mRecyclerView.setHasFixedSize(true);
             //https://stackoverflow.com/questions/32324926/swipe-one-item-at-a-time-recyclerview
@@ -74,5 +73,13 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder>{
         public void bindItem(Item item) {
             //itemTextView.setText(item.getName());
         }
+    }
+    //tu sa naplni profil a prispevky profilu
+    private ArrayList<Item> populateItems() {
+        ArrayList<Item> items = new ArrayList<>();
+        items.add(new Item("fero","10.1.2019", null,"5",null,null,true));
+        items.add(new Item("fero",null, "12.1.2019",null,null,null,false));
+        items.add(new Item("fero",null, "13.1.2019",null,null,null,false));
+        return items;
     }
 }

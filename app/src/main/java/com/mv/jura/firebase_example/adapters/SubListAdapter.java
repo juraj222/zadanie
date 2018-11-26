@@ -4,6 +4,8 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.mv.jura.firebase_example.Item;
@@ -40,8 +42,22 @@ public class SubListAdapter extends RecyclerView.Adapter<SubListAdapter.ViewHold
         return mItems.size();
     }
     public class ViewHolder extends RecyclerView.ViewHolder {
-        @Bind(R.id.itemTextView)
-        TextView itemTextView;
+        @Bind(R.id.relativeLayoutProfile)
+        RelativeLayout relativeLayoutProfile;
+        @Bind(R.id.relativeLayoutPost)
+        RelativeLayout relativeLayoutPost;
+        @Bind(R.id.textViewProfileName)
+        TextView textViewProfileName;
+        @Bind(R.id.textViewProfileDate)
+        TextView textViewProfileDate;
+        @Bind(R.id.textViewProfilePostCount)
+        TextView textViewProfilePostCount;
+        @Bind(R.id.textViewPostName)
+        TextView textViewPostName;
+        @Bind(R.id.textViewPostDate)
+        TextView textViewPostDate;
+        @Bind(R.id.imageView)
+        ImageView imageView;
 
         private Context mContext;
 
@@ -52,7 +68,21 @@ public class SubListAdapter extends RecyclerView.Adapter<SubListAdapter.ViewHold
         }
 
         public void bindItem(Item item) {
-            itemTextView.setText(item.getName());
+            if(item.isProfile()){
+                relativeLayoutProfile.setVisibility(View.VISIBLE);
+                relativeLayoutPost.setVisibility(View.INVISIBLE);
+                textViewProfileName.setText(item.getName());
+                textViewProfileDate.setText(item.getRegistrationDate());
+                textViewProfilePostCount.setText(item.getPostCount());
+            }else{
+                relativeLayoutProfile.setVisibility(View.INVISIBLE);
+                relativeLayoutPost.setVisibility(View.VISIBLE);
+                textViewPostName.setText(item.getName());
+                textViewPostDate.setText(item.getDate());
+            }
+
+
+
         }
     }
 }
