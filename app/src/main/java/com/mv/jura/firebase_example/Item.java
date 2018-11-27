@@ -1,5 +1,7 @@
 package com.mv.jura.firebase_example;
 
+import com.google.android.exoplayer2.ExoPlayer;
+
 import java.net.URI;
 
 public class Item {
@@ -8,13 +10,15 @@ public class Item {
     String registrationDate;
     String postCount;
     String imageUrl;
-    URI videoUrl;
+    String videoUrl;
     boolean isProfile;
+
+    ExoPlayer videoPlayer;
 
     public Item() {
     }
 
-    public Item(String name, String registrationDate, String date,  String postCount, String imageUrl, URI videoUrl, boolean isProfile) {
+    public Item(String name, String registrationDate, String date,  String postCount, String imageUrl, String videoUrl, boolean isProfile) {
         this.name = name;
         this.date = date;
         this.registrationDate = registrationDate;
@@ -22,6 +26,8 @@ public class Item {
         this.imageUrl = imageUrl;
         this.videoUrl = videoUrl;
         this.isProfile = isProfile;
+
+        this.videoPlayer = null;
     }
 
     public String getRegistrationDate() {
@@ -64,11 +70,11 @@ public class Item {
         this.imageUrl = imageUrl;
     }
 
-    public URI getVideoUrl() {
+    public String getVideoUrl() {
         return videoUrl;
     }
 
-    public void setVideoUrl(URI videoUrl) {
+    public void setVideoUrl(String videoUrl) {
         this.videoUrl = videoUrl;
     }
 
@@ -78,5 +84,13 @@ public class Item {
 
     public void setProfile(boolean profile) {
         isProfile = profile;
+    }
+
+    public ExoPlayer getVideoPlayer() {
+        return videoPlayer;
+    }
+
+    public void setVideoPlayer(ExoPlayer videoPlayer) {
+        this.videoPlayer = videoPlayer;
     }
 }

@@ -60,7 +60,7 @@
     </RelativeLayout>
 
     <RelativeLayout
-        android:id="@+id/relativeLayoutPost"
+        android:id="@+id/relativeLayoutImagePost"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
             <!-- tento ImageView sa zmeni na obr alebo video -->
@@ -71,15 +71,50 @@
                 app:srcCompat="@drawable/ic_launcher_background" />
 
             <TextView
-                android:id="@+id/textViewPostName"
+                android:id="@+id/textViewImagePostName"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_above="@+id/textViewPostDate"
+                android:layout_above="@+id/textViewImagePostDate"
                 android:text="ProfileName"
                 android:textSize="18sp" />
 
             <TextView
-                android:id="@+id/textViewPostDate"
+                android:id="@+id/textViewImagePostDate"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                android:text="PostDate"
+                android:textSize="30sp" />
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/relativeLayoutVideoPost"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <com.google.android.exoplayer2.ui.PlayerView
+                android:id="@+id/playerView"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginBottom="8dp"
+                android:layout_marginEnd="8dp"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="8dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="parent"></com.google.android.exoplayer2.ui.PlayerView>
+
+            <TextView
+                android:id="@+id/textViewVideoPostName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_above="@+id/textViewVideoPostDate"
+                android:text="ProfileName"
+                android:textSize="18sp" />
+
+            <TextView
+                android:id="@+id/textViewVideoPostDate"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentBottom="true"
