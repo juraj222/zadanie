@@ -77,9 +77,9 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder>{
     //tu sa naplni profil a prispevky profilu
     private ArrayList<Item> populateItems() {
         ArrayList<Item> items = new ArrayList<>();
-        items.add(new Item("fero","10.1.2019", null,"5",null,null,true));
-        items.add(new Item("fero",null, "12.1.2019",null,null,null,false));
-        items.add(new Item("fero",null, "13.1.2019",null,null,null,false));
+        items.add(new Item("fero","10.1.2019", null,"5","http://i.imgur.com/e7MfwB0.jpg",null,true));
+        items.add(new Item("fero",null, "12.1.2019",null,"http://i.imgur.com/e7MfwB0.jpg",null,false));
+        items.add(new Item("fero",null, "13.1.2019",null,"http://i.imgur.com/e7MfwB0.jpg",null,false));
         return items;
     }
 }

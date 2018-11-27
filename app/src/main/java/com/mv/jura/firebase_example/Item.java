@@ -7,14 +7,14 @@ public class Item {
     String date;
     String registrationDate;
     String postCount;
-    URI imageUrl;
+    String imageUrl;
     URI videoUrl;
     boolean isProfile;
 
     public Item() {
     }
 
-    public Item(String name, String registrationDate, String date,  String postCount, URI imageUrl, URI videoUrl, boolean isProfile) {
+    public Item(String name, String registrationDate, String date,  String postCount, String imageUrl, URI videoUrl, boolean isProfile) {
         this.name = name;
         this.date = date;
         this.registrationDate = registrationDate;
@@ -56,11 +56,11 @@ public class Item {
         this.date = date;
     }
 
-    public URI getImageUrl() {
+    public String getImageUrl() {
         return imageUrl;
     }
 
-    public void setImageUrl(URI imageUrl) {
+    public void setImageUrl(String imageUrl) {
         this.imageUrl = imageUrl;
     }
 

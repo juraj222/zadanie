@@ -10,6 +10,7 @@ import android.widget.TextView;
 
 import com.mv.jura.firebase_example.Item;
 import com.mv.jura.firebase_example.R;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 
@@ -79,10 +80,16 @@ public class SubListAdapter extends RecyclerView.Adapter<SubListAdapter.ViewHold
                 relativeLayoutPost.setVisibility(View.VISIBLE);
                 textViewPostName.setText(item.getName());
                 textViewPostDate.setText(item.getDate());
+
+                if (item.getImageUrl() != null) {
+                    Picasso.get().setLoggingEnabled(true);
+                    Picasso.get()
+                            .load(item.getImageUrl())
+                            .placeholder(R.drawable.common_full_open_on_phone)
+                            .error(R.drawable.ic_launcher_background)
+                            .into(imageView);
+                }
             }
-
-
-
         }
     }
 }
