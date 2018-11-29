@@ -10,22 +10,44 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.google.api.core.ApiFuture;
+import com.google.auth.oauth2.GoogleCredentials;
+import com.google.cloud.firestore.Firestore;
+import com.google.cloud.firestore.QueryDocumentSnapshot;
+import com.google.cloud.firestore.QuerySnapshot;
+import com.google.firebase.FirebaseApp;
+import com.google.firebase.FirebaseOptions;
+import com.google.firebase.cloud.FirestoreClient;
 import com.mv.jura.firebase_example.Item;
 import com.mv.jura.firebase_example.R;
 
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 import butterknife.ButterKnife;
 
 //https://www.learnhowtoprogram.com/android/web-service-backends-and-custom-fragments/custom-adapters-with-recyclerview
-public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder>{
+public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder> {
     private ArrayList<Item> mItems = new ArrayList<>();
     private Context mContext;
+    private Firestore db;
 
-    public ListAdapter(Context context, ArrayList<Item> items) {
+    public ListAdapter(Context context, ArrayList<Item> items) throws IOException {
         mContext = context;
         mItems = items;
+
+        GoogleCredentials credentials = GoogleCredentials.getApplicationDefault();
+        FirebaseOptions options = new FirebaseOptions.Builder()
+             //   .setCredentials(credentials)
+                .setProjectId("project-mv-7583a")
+                .build();
+        FirebaseApp.initializeApp(mContext, options);
+
+        db = FirestoreClient.getFirestore();
     }
+
     @Override
     public ListAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_list, parent, false);
@@ -51,6 +73,7 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder>{
     public int getItemCount() {
         return mItems.size();
     }
+
     public class ViewHolder extends RecyclerView.ViewHolder {
         //@Bind(R.id.itemTextView) TextView itemTextView;
 
@@ -86,12 +109,39 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder>{
 
 
     }
+
     //tu sa naplni profil a prispevky profilu
     private ArrayList<Item> populateItems() {
         ArrayList<Item> items = new ArrayList<>();
-        items.add(new Item("fero","10.1.2019", null,"5",null,null,true));
-        items.add(new Item("fero",null, "12.1.2019",null,null,"http://clips.vorwaerts-gmbh.de/big_buck_bunny.mp4",false));
-        items.add(new Item("fero",null, "13.1.2019",null,"http://i.imgur.com/e7MfwB0.jpg",null,false));
+        items.add(new Item("fero", "10.1.2019", null, "5", null, null, true));
+        items.add(new Item("fero", null, "12.1.2019", null, null, "http://clips.vorwaerts-gmbh.de/big_buck_bunny.mp4", false));
+        items.add(new Item("fero", null, "13.1.2019", null, "http://i.imgur.com/e7MfwB0.jpg", null, false));
         return items;
+    }
+
+    private Item getItem() {
+        // asynchronously retrieve all users
+        ApiFuture<QuerySnapshot> query = db.collection("users").get();
+        // ...
+        // query.get() blocks on response
+        QuerySnapshot querySnapshot = null;
+        try {
+            querySnapshot = query.get();
+            List<QueryDocumentSnapshot> documents = querySnapshot.getDocuments();
+            for (QueryDocumentSnapshot document : documents) {
+                System.out.println("User: " + document.getId());
+                System.out.println("First: " + document.getString("username"));
+//                if (document.contains("middle")) {
+//                    System.out.println("Middle: " + document.getString("middle"));
+//                }
+//                System.out.println("Last: " + document.getString("last"));
+//                System.out.println("Born: " + document.getLong("born"));
+            }
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 }

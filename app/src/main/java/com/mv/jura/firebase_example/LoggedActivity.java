@@ -8,6 +8,7 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SnapHelper;
 
 
+import java.io.IOException;
 import java.util.ArrayList;
 import com.mv.jura.firebase_example.adapters.ListAdapter;
 import butterknife.Bind;
@@ -41,7 +42,11 @@ public class LoggedActivity extends AppCompatActivity {
     }
 
     public void run() {
-        mAdapter = new ListAdapter(getApplicationContext(), items);
+        try {
+            mAdapter = new ListAdapter(getApplicationContext(), items);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         mRecyclerView.setAdapter(mAdapter);
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this,LinearLayoutManager.HORIZONTAL,false);
         mRecyclerView.setLayoutManager(layoutManager);
