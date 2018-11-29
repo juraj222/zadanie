@@ -6,24 +6,23 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.PagerSnapHelper;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SnapHelper;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.google.api.core.ApiFuture;
-import com.google.auth.oauth2.GoogleCredentials;
-import com.google.cloud.firestore.Firestore;
-import com.google.cloud.firestore.QueryDocumentSnapshot;
-import com.google.cloud.firestore.QuerySnapshot;
-import com.google.firebase.FirebaseApp;
-import com.google.firebase.FirebaseOptions;
-import com.google.firebase.cloud.FirestoreClient;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.mv.jura.firebase_example.Item;
 import com.mv.jura.firebase_example.R;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
 import butterknife.ButterKnife;
@@ -32,20 +31,13 @@ import butterknife.ButterKnife;
 public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder> {
     private ArrayList<Item> mItems = new ArrayList<>();
     private Context mContext;
-    private Firestore db;
+    private FirebaseFirestore db;
 
     public ListAdapter(Context context, ArrayList<Item> items) throws IOException {
         mContext = context;
         mItems = items;
 
-        GoogleCredentials credentials = GoogleCredentials.getApplicationDefault();
-        FirebaseOptions options = new FirebaseOptions.Builder()
-             //   .setCredentials(credentials)
-                .setProjectId("project-mv-7583a")
-                .build();
-        FirebaseApp.initializeApp(mContext, options);
-
-        db = FirestoreClient.getFirestore();
+        db = FirebaseFirestore.getInstance();
     }
 
     @Override
@@ -120,28 +112,28 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder> {
     }
 
     private Item getItem() {
-        // asynchronously retrieve all users
-        ApiFuture<QuerySnapshot> query = db.collection("users").get();
-        // ...
-        // query.get() blocks on response
-        QuerySnapshot querySnapshot = null;
-        try {
-            querySnapshot = query.get();
-            List<QueryDocumentSnapshot> documents = querySnapshot.getDocuments();
-            for (QueryDocumentSnapshot document : documents) {
-                System.out.println("User: " + document.getId());
-                System.out.println("First: " + document.getString("username"));
-//                if (document.contains("middle")) {
-//                    System.out.println("Middle: " + document.getString("middle"));
-//                }
-//                System.out.println("Last: " + document.getString("last"));
-//                System.out.println("Born: " + document.getLong("born"));
-            }
-        } catch (ExecutionException e) {
-            e.printStackTrace();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        // Create a new user with a first and last name
+        Map<String, Object> user = new HashMap<>();
+        user.put("first", "Ada");
+        user.put("last", "Lovelace");
+        user.put("born", 1815);
+
+// Add a new document with a generated ID
+        db.collection("users")
+                .add(user)
+                .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+                    @Override
+                    public void onSuccess(DocumentReference documentReference) {
+                        Log.d("dw", "DocumentSnapshot added with ID: " + documentReference.getId());
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.w("dw", "Error adding document", e);
+                    }
+                });
+
         return null;
     }
 }
