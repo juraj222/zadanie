@@ -23,7 +23,10 @@ import com.google.firebase.firestore.FirebaseFirestoreSettings;
 import com.mv.jura.firebase_example.Item;
 import com.mv.jura.firebase_example.R;
 
+import java.sql.Date;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -139,12 +142,15 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder>{
         return items;
     }
 
-    private void addItem(Item item){
+    private void createpost(PostType type, String videourl, String imageurl, String username, Calendar date, String userid){
         Map<String, Object> newItem = new HashMap<>();
-        newItem.put("username", item.getName());
-        newItem.put("date", item.getDate());
-        newItem.put("numberOfPosts", item.getPostCount());
-        db.collection("users").document("Pokus").set(newItem)
+        newItem.put("type", type);
+        newItem.put("videourl", videourl);
+        newItem.put("imageurl", imageurl);
+        newItem.put("username", username);
+        newItem.put("userid", userid);
+        newItem.put("date",  new SimpleDateFormat("yyyyMMdd_HHmmss").format(date.getInstance().getTime()));
+        db.collection("users").document().set(newItem)
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {
@@ -153,6 +159,34 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder>{
                 .addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
+                    }
+                });
+    }
+
+    private void createRegistration(String name, String userId){
+        Map<String, Object> newItem = new HashMap<>();
+        newItem.put("username", name);
+        newItem.put("date",  new SimpleDateFormat("yyyyMMdd_HHmmss").format(Calendar.getInstance().getTime()));
+        newItem.put("numberOfPosts", 0);
+        db.collection("users").document(userId).set(newItem)
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                    }
+                });
+    }
+
+    private void UpdateRegistration(int numberOfPosts, String userId) {
+        DocumentReference contact = db.collection("users").document(userId);
+        contact.update("numberOfPosts", numberOfPosts)
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
                     }
                 });
     }
