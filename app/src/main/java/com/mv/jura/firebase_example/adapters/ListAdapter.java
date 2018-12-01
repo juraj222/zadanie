@@ -25,6 +25,7 @@ import com.mv.jura.firebase_example.R;
 
 import java.sql.Date;
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
@@ -117,6 +118,8 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder>{
         //items.add(new Item("fero",null, "13.1.2019",null,"http://i.imgur.com/e7MfwB0.jpg",null,false));
         items = getData();
 //        addItem(new Item("fero","10.1.2019", null,"5",null,null,true));
+//        createRegistration("pokus2", "user2");
+//        createpost(PostType.image, "", "http://i.imgur.com/e7MfwB0.jpg", "pokus2", Calendar.getInstance(), "user2");
         return items;
     }
 
@@ -144,13 +147,13 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder>{
 
     private void createpost(PostType type, String videourl, String imageurl, String username, Calendar date, String userid){
         Map<String, Object> newItem = new HashMap<>();
-        newItem.put("type", type);
+        newItem.put("type", type.toString());
         newItem.put("videourl", videourl);
         newItem.put("imageurl", imageurl);
         newItem.put("username", username);
         newItem.put("userid", userid);
         newItem.put("date",  new SimpleDateFormat("yyyyMMdd_HHmmss").format(date.getInstance().getTime()));
-        db.collection("users").document().set(newItem)
+        db.collection("posts").document().set(newItem)
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {
