@@ -6,11 +6,9 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.PagerSnapHelper;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SnapHelper;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -20,12 +18,13 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreSettings;
+import com.google.firebase.firestore.Query;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 import com.mv.jura.firebase_example.Item;
 import com.mv.jura.firebase_example.R;
 
-import java.sql.Date;
 import java.text.SimpleDateFormat;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
@@ -114,18 +113,18 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder>{
     private ArrayList<Item> populateItems() {
         ArrayList<Item> items = new ArrayList<>();
 //        items.add(new Item("fero","10.1.2019", null,"5",null,null,true));
-        //items.add(new Item("fero",null, "12.1.2019",null,null,"http://clips.vorwaerts-gmbh.de/big_buck_bunny.mp4",false));
-        //items.add(new Item("fero",null, "13.1.2019",null,"http://i.imgur.com/e7MfwB0.jpg",null,false));
-        items = getData();
+//        items.add(new Item("fero",null, "12.1.2019",null,null,"http://clips.vorwaerts-gmbh.de/big_buck_bunny.mp4",false));
+//        items.add(new Item("fero",null, "13.1.2019",null,"http://i.imgur.com/e7MfwB0.jpg",null,false));
+        items = getItems("user2");
 //        addItem(new Item("fero","10.1.2019", null,"5",null,null,true));
 //        createRegistration("pokus2", "user2");
 //        createpost(PostType.image, "", "http://i.imgur.com/e7MfwB0.jpg", "pokus2", Calendar.getInstance(), "user2");
         return items;
     }
 
-    private ArrayList<Item> getData(){
+    private ArrayList<Item> getItems(String userId){
         final ArrayList<Item> items = new ArrayList<>();
-        DocumentReference user = db.collection("users").document("Pokus");
+        DocumentReference user = db.collection("users").document(userId);
         user.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
@@ -134,14 +133,26 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder>{
                     items.add(new Item( doc.getString("username"),doc.get("date").toString(), null,doc.get("numberOfPosts").toString(),null,null,true));
                 }
             }
-        })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        e.printStackTrace();
-                    }
-                });
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                e.printStackTrace();
+            }
+        });
 
+        Query query = db.collection("posts").whereEqualTo("userid", "user2");
+        query.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                if (task.isSuccessful()) {
+                    for (QueryDocumentSnapshot doc : task.getResult()) {
+                        items.add(new Item( doc.getString("username"), null, doc.get("date").toString(), null,doc.get("imageurl").toString(),doc.get("videourl").toString(),false));
+                    }
+                } else {
+
+                }
+            }
+        });
         return items;
     }
 
