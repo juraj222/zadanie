@@ -42,12 +42,17 @@ public class LoggedActivity extends AppCompatActivity {
 
     private ArrayList<Item> populateProfiles() {
         items = new ArrayList<>();
-        //tu sa naplni items tolkokrat kolko bude vedla seba profilov
-        items.add(new Item());
-        items.add(new Item());
-        items.add(new Item());
-        items.add(new Item());
+        items.add(new Item("abc"));
+        items.add(new Item("xy"));
+        /*for (String userId: getUserIds()) {
+            items.add(new Item(userId));
+        }*/
         return items;
+    }
+
+    private ArrayList<String> getUserIds(){
+        //pole userId, ktory maju viac ako 0 prispevkov, zoradene podla casu posledneho prispevku // mozu sa opakovat
+        return null;
     }
 
     public void run() {

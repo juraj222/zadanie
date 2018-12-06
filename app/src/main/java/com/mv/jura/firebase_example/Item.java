@@ -5,6 +5,7 @@ import com.google.android.exoplayer2.ExoPlayer;
 import java.net.URI;
 
 public class Item {
+    String userId;
     String name;
     String date;
     String registrationDate;
@@ -16,7 +17,11 @@ public class Item {
     public Item() {
     }
 
-    public Item(String name, String registrationDate, String date,  String postCount, String imageUrl, String videoUrl, boolean isProfile) {
+    public Item(String userId) {
+        this.userId = userId;
+    }
+
+    public Item(String name, String registrationDate, String date, String postCount, String imageUrl, String videoUrl, boolean isProfile) {
         this.name = name;
         this.date = date;
         this.registrationDate = registrationDate;
@@ -24,6 +29,14 @@ public class Item {
         this.imageUrl = imageUrl;
         this.videoUrl = videoUrl;
         this.isProfile = isProfile;
+    }
+
+    public String getUserId() {
+        return userId;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
     }
 
     public String getRegistrationDate() {

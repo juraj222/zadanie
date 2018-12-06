@@ -43,6 +43,7 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder>{
     private FirebaseFirestore db;
     private SimpleExoPlayer mPlayer;
 
+
     public ListAdapter(Context context, ArrayList<Item> items) {
         mContext = context;
         mItems = items;
@@ -83,7 +84,7 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder>{
             mContext = itemView.getContext();
             SubListAdapter mAdapter;
             ArrayList<Item> items;
-            items = populateItems();
+            items = populateItems(null);
 
 
             RecyclerView mRecyclerView = itemView.findViewById(R.id.subRecyclerView);
@@ -109,8 +110,9 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder>{
 
     }
     //tu sa naplni profil a prispevky profilu
-    private ArrayList<Item> populateItems() {
+    private ArrayList<Item> populateItems(String userId) {
         ArrayList<Item> items = new ArrayList<>();
+
 //        items.add(new Item("fero","10.1.2019", null,"5",null,null,true));
 //        items.add(new Item("fero",null, "12.1.2019",null,null,"http://clips.vorwaerts-gmbh.de/big_buck_bunny.mp4",false));
 //        items.add(new Item("fero",null, "13.1.2019",null,"http://i.imgur.com/e7MfwB0.jpg",null,false));
