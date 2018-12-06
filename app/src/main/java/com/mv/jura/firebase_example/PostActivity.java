@@ -24,6 +24,12 @@ import android.widget.ImageView;
 import android.widget.Toast;
 import android.widget.VideoView;
 
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreSettings;
+import com.mv.jura.firebase_example.adapters.PostType;
+
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
@@ -40,6 +46,10 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 public class PostActivity extends Activity {
@@ -52,10 +62,12 @@ public class PostActivity extends Activity {
     private int photoVideoMode = 0; //1-photo, 2-video
     Bitmap photo;
     Uri videoUri;
+    private FirebaseFirestore db;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_post);
+        initDB();
         getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
         this.photoView = (ImageView)this.findViewById(R.id.photoView);
         this.videoView = (VideoView) this.findViewById(R.id.videoView);
@@ -131,6 +143,14 @@ public class PostActivity extends Activity {
                 }
             }
         });
+    }
+    private void initDB(){
+        // Access a Cloud Firestore instance from your Activity
+        db = FirebaseFirestore.getInstance();
+        FirebaseFirestoreSettings settings = new FirebaseFirestoreSettings.Builder()
+                .setTimestampsInSnapshotsEnabled(true)
+                .build();
+        db.setFirestoreSettings(settings);
     }
 
     private void sendVideoToServer() {
@@ -248,6 +268,27 @@ public class PostActivity extends Activity {
             if(result != null) {
                 String filePath = "http://mobv.mcomputing.eu/upload/v/" + result;
             }
+        }
+        private void createpost(PostType type, String videourl, String imageurl, String username, Calendar date, String userid){
+            Map<String, Object> newItem = new HashMap<>();
+            newItem.put("type", type.toString());
+            newItem.put("videourl", videourl);
+            newItem.put("imageurl", imageurl);
+            newItem.put("username", username);
+            newItem.put("userid", userid);
+            newItem.put("date",  new SimpleDateFormat("yyyyMMdd_HHmmss").format(date.getInstance().getTime()));
+            db.collection("posts").document().set(newItem)
+                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                        @Override
+                        public void onSuccess(Void aVoid) {
+                            //tu by sa mala potom aktualizovat appka o novy prispevok
+                        }
+                    })
+                    .addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                        }
+                    });
         }
 
     }

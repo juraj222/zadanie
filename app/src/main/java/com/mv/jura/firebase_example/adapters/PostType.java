@@ -1,6 +1,6 @@
 package com.mv.jura.firebase_example.adapters;
 
-enum PostType {
+public enum PostType {
     image,
     video
 }

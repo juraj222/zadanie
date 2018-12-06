@@ -40,23 +40,26 @@ import butterknife.ButterKnife;
 public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder>{
     private ArrayList<Item> mItems = new ArrayList<>();
     private Context mContext;
-    private FirebaseFirestore db;
     private SimpleExoPlayer mPlayer;
-
+    private FirebaseFirestore db;
+    private int indexOfUserIds;
 
     public ListAdapter(Context context, ArrayList<Item> items) {
         mContext = context;
         mItems = items;
+        indexOfUserIds = 0;
+        initDB();
+        mPlayer = ExoPlayerFactory.newSimpleInstance(mContext, new DefaultTrackSelector());
+        mPlayer.setRepeatMode(Player.REPEAT_MODE_ONE);
+        mPlayer.setPlayWhenReady(true);
+    }
+    private void initDB(){
         // Access a Cloud Firestore instance from your Activity
         db = FirebaseFirestore.getInstance();
         FirebaseFirestoreSettings settings = new FirebaseFirestoreSettings.Builder()
                 .setTimestampsInSnapshotsEnabled(true)
                 .build();
         db.setFirestoreSettings(settings);
-
-        mPlayer = ExoPlayerFactory.newSimpleInstance(mContext, new DefaultTrackSelector());
-        mPlayer.setRepeatMode(Player.REPEAT_MODE_ONE);
-        mPlayer.setPlayWhenReady(true);
     }
     @Override
     public ListAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -84,8 +87,7 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder>{
             mContext = itemView.getContext();
             SubListAdapter mAdapter;
             ArrayList<Item> items;
-            items = populateItems(null);
-
+            items = populateItems(mItems.get(indexOfUserIds++).getUserId());
 
             RecyclerView mRecyclerView = itemView.findViewById(R.id.subRecyclerView);
 
@@ -112,15 +114,31 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder>{
     //tu sa naplni profil a prispevky profilu
     private ArrayList<Item> populateItems(String userId) {
         ArrayList<Item> items = new ArrayList<>();
-
+        items.add(getProfile(userId)); //prida sa profil
+        items.addAll(getPosts(userId)); // pridaju sa prispevky pouzivatela
 //        items.add(new Item("fero","10.1.2019", null,"5",null,null,true));
 //        items.add(new Item("fero",null, "12.1.2019",null,null,"http://clips.vorwaerts-gmbh.de/big_buck_bunny.mp4",false));
 //        items.add(new Item("fero",null, "13.1.2019",null,"http://i.imgur.com/e7MfwB0.jpg",null,false));
-        items = getItems("user2");
+        //items = getItems("user2");
 //        addItem(new Item("fero","10.1.2019", null,"5",null,null,true));
 //        createRegistration("pokus2", "user2");
 //        createpost(PostType.image, "", "http://i.imgur.com/e7MfwB0.jpg", "pokus2", Calendar.getInstance(), "user2");
 //        createpost(PostType.video, "http://clips.vorwaerts-gmbh.de/big_buck_bunny.mp4", "", "pokus2", Calendar.getInstance(), "user2");
+        return items;
+    }
+    private Item getProfile(String userId){
+        String name = null;
+        String registrationDate = null;
+        String postCount = null;
+
+        // tu sa naplnia z DB tieto 3 stringy
+
+        return new Item(name,registrationDate, null,postCount,null,null,true);
+    }
+    private ArrayList<Item> getPosts(String userId){
+        ArrayList<Item> items = new ArrayList<>();
+        // tu sa ziskaju posty z DB a pridaju sa do items, zoradene maju byt podla casu prispevku
+        // items.add(new Item("fero",null, "13.1.2019",null,"http://i.imgur.com/e7MfwB0.jpg",null,false));
         return items;
     }
 
@@ -158,26 +176,6 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder>{
         return items;
     }
 
-    private void createpost(PostType type, String videourl, String imageurl, String username, Calendar date, String userid){
-        Map<String, Object> newItem = new HashMap<>();
-        newItem.put("type", type.toString());
-        newItem.put("videourl", videourl);
-        newItem.put("imageurl", imageurl);
-        newItem.put("username", username);
-        newItem.put("userid", userid);
-        newItem.put("date",  new SimpleDateFormat("yyyyMMdd_HHmmss").format(date.getInstance().getTime()));
-        db.collection("posts").document().set(newItem)
-                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                    @Override
-                    public void onSuccess(Void aVoid) {
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                    }
-                });
-    }
 
     private void createRegistration(String name, String userId){
         Map<String, Object> newItem = new HashMap<>();
