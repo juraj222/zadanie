@@ -1,6 +1,7 @@
 package com.mv.jura.firebase_example;
 
 import android.content.Intent;
+import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
@@ -13,6 +14,17 @@ import android.view.View;
 
 
 import java.util.ArrayList;
+
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreSettings;
+import com.google.firebase.firestore.Query;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 import com.mv.jura.firebase_example.adapters.ListAdapter;
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -41,18 +53,37 @@ public class LoggedActivity extends AppCompatActivity {
     }
 
     private ArrayList<Item> populateProfiles() {
-        items = new ArrayList<>();
-        items.add(new Item("abc"));
-        items.add(new Item("xy"));
+        items = getUserIds();
         /*for (String userId: getUserIds()) {
             items.add(new Item(userId));
         }*/
         return items;
     }
 
-    private ArrayList<String> getUserIds(){
+    private ArrayList<Item> getUserIds(){
         //pole userId, ktory maju viac ako 0 prispevkov, zoradene podla casu posledneho prispevku // mozu sa opakovat
-        return null;
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        FirebaseFirestoreSettings settings = new FirebaseFirestoreSettings.Builder()
+                .setTimestampsInSnapshotsEnabled(true)
+                .build();
+        db.setFirestoreSettings(settings);
+
+        final ArrayList<Item> items = new ArrayList<>();
+        Query query = db.collection("posts");
+        query.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                if (task.isSuccessful()) {
+                    for (QueryDocumentSnapshot doc : task.getResult()) {
+                        items.add( new Item(doc.getString("userid")));
+                    }
+                } else {
+
+                }
+            }
+        });
+
+        return items;
     }
 
     public void run() {
