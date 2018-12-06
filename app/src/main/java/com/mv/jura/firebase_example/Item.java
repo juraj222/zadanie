@@ -13,8 +13,6 @@ public class Item {
     String videoUrl;
     boolean isProfile;
 
-    ExoPlayer videoPlayer;
-
     public Item() {
     }
 
@@ -26,8 +24,6 @@ public class Item {
         this.imageUrl = imageUrl;
         this.videoUrl = videoUrl;
         this.isProfile = isProfile;
-
-        this.videoPlayer = null;
     }
 
     public String getRegistrationDate() {
@@ -84,13 +80,5 @@ public class Item {
 
     public void setProfile(boolean profile) {
         isProfile = profile;
-    }
-
-    public ExoPlayer getVideoPlayer() {
-        return videoPlayer;
-    }
-
-    public void setVideoPlayer(ExoPlayer videoPlayer) {
-        this.videoPlayer = videoPlayer;
     }
 }

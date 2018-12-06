@@ -10,6 +10,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.google.android.exoplayer2.ExoPlayerFactory;
+import com.google.android.exoplayer2.Player;
+import com.google.android.exoplayer2.SimpleExoPlayer;
+import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -37,6 +41,7 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder>{
     private ArrayList<Item> mItems = new ArrayList<>();
     private Context mContext;
     private FirebaseFirestore db;
+    private SimpleExoPlayer mPlayer;
 
     public ListAdapter(Context context, ArrayList<Item> items) {
         mContext = context;
@@ -47,6 +52,10 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder>{
                 .setTimestampsInSnapshotsEnabled(true)
                 .build();
         db.setFirestoreSettings(settings);
+
+        mPlayer = ExoPlayerFactory.newSimpleInstance(mContext, new DefaultTrackSelector());
+        mPlayer.setRepeatMode(Player.REPEAT_MODE_ONE);
+        mPlayer.setPlayWhenReady(true);
     }
     @Override
     public ListAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -58,16 +67,6 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder>{
     @Override
     public void onBindViewHolder(ListAdapter.ViewHolder holder, int position) {
         holder.bindItem(mItems.get(position));
-    }
-
-    @Override
-    public void onViewRecycled(ListAdapter.ViewHolder holder) {
-        int position = holder.getAdapterPosition();
-        if (mItems.get(position) != null && mItems.get(position).getVideoPlayer() != null) {
-            mItems.get(position).getVideoPlayer().release();
-        }
-        super.onViewRecycled(holder);
-
     }
 
     @Override
@@ -89,7 +88,7 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder>{
 
             RecyclerView mRecyclerView = itemView.findViewById(R.id.subRecyclerView);
 
-            mAdapter = new SubListAdapter(mContext, items);
+            mAdapter = new SubListAdapter(mContext, items, mPlayer);
             mRecyclerView.setAdapter(mAdapter);
             RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(mContext);
             layoutManager.scrollToPosition(1); // tu mozno bude chyba, ak nie je ziaden prispevok
@@ -119,6 +118,7 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder>{
 //        addItem(new Item("fero","10.1.2019", null,"5",null,null,true));
 //        createRegistration("pokus2", "user2");
 //        createpost(PostType.image, "", "http://i.imgur.com/e7MfwB0.jpg", "pokus2", Calendar.getInstance(), "user2");
+//        createpost(PostType.video, "http://clips.vorwaerts-gmbh.de/big_buck_bunny.mp4", "", "pokus2", Calendar.getInstance(), "user2");
         return items;
     }
 

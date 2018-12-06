@@ -1,7 +1,6 @@
 package com.mv.jura.firebase_example.adapters;
 import android.content.Context;
 import android.net.Uri;
-import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,18 +9,14 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.google.android.exoplayer2.ExoPlayerFactory;
-import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.SimpleExoPlayer;
 import com.google.android.exoplayer2.source.ExtractorMediaSource;
 import com.google.android.exoplayer2.source.MediaSource;
-import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
 import com.google.android.exoplayer2.ui.PlayerView;
 import com.google.android.exoplayer2.upstream.DataSource;
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
 import com.google.android.exoplayer2.util.Util;
 import com.mv.jura.firebase_example.Item;
-import com.mv.jura.firebase_example.LoggedActivity;
 import com.mv.jura.firebase_example.R;
 import com.squareup.picasso.Picasso;
 
@@ -34,10 +29,12 @@ import butterknife.ButterKnife;
 public class SubListAdapter extends RecyclerView.Adapter<SubListAdapter.ViewHolder>{
     private ArrayList<Item> mItems = new ArrayList<>();
     private Context mContext;
+    private SimpleExoPlayer mPlayer;
 
-    public SubListAdapter(Context context, ArrayList<Item> items) {
+    public SubListAdapter(Context context, ArrayList<Item> items, SimpleExoPlayer player) {
         mContext = context;
         mItems = items;
+        mPlayer = player;
     }
     @Override
     public SubListAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -48,16 +45,7 @@ public class SubListAdapter extends RecyclerView.Adapter<SubListAdapter.ViewHold
 
     @Override
     public void onBindViewHolder(SubListAdapter.ViewHolder holder, int position) {
-        holder.bindItem(mItems.get(position));
-    }
-
-    @Override
-    public void onViewRecycled(@NonNull ViewHolder holder) {
-        int position = holder.getAdapterPosition();
-        if (mItems.get(position) != null && mItems.get(position).getVideoPlayer() != null) {
-            mItems.get(position).getVideoPlayer().release();
-        }
-        super.onViewRecycled(holder);
+        holder.bindItem(mItems.get(position), mPlayer);
     }
 
     @Override
@@ -101,7 +89,7 @@ public class SubListAdapter extends RecyclerView.Adapter<SubListAdapter.ViewHold
             mContext = itemView.getContext();
         }
 
-        public void bindItem(Item item) {
+        public void bindItem(Item item, SimpleExoPlayer player) {
             if(item.isProfile()){
                 relativeLayoutProfile.setVisibility(View.VISIBLE);
                 relativeLayoutVideoPost.setVisibility(View.INVISIBLE);
@@ -110,7 +98,7 @@ public class SubListAdapter extends RecyclerView.Adapter<SubListAdapter.ViewHold
                 textViewProfileDate.setText(item.getRegistrationDate());
                 textViewProfilePostCount.setText(item.getPostCount());
             }else{
-                if (item.getImageUrl() != null) {
+                if (item.getImageUrl() != null && !item.getImageUrl().isEmpty()) {
                     relativeLayoutProfile.setVisibility(View.INVISIBLE);
                     relativeLayoutVideoPost.setVisibility(View.INVISIBLE);
                     relativeLayoutImagePost.setVisibility(View.VISIBLE);
@@ -122,7 +110,10 @@ public class SubListAdapter extends RecyclerView.Adapter<SubListAdapter.ViewHold
                             .load(item.getImageUrl())
                             .placeholder(R.drawable.common_full_open_on_phone)
                             .error(R.drawable.ic_launcher_background)
+                            .fit()
+                            .centerInside()
                             .into(imageView);
+
                 } else {
                     relativeLayoutProfile.setVisibility(View.INVISIBLE);
                     relativeLayoutImagePost.setVisibility(View.INVISIBLE);
@@ -130,21 +121,13 @@ public class SubListAdapter extends RecyclerView.Adapter<SubListAdapter.ViewHold
                     textViewVideoPostName.setText(item.getName());
                     textViewVideoPostDate.setText(item.getDate());
 
-                    SimpleExoPlayer player = ExoPlayerFactory.newSimpleInstance(mContext, new DefaultTrackSelector());
-                    // Produces DataSource instances through which media data is loaded.
                     DataSource.Factory dataSourceFactory = new DefaultDataSourceFactory(mContext,
                             Util.getUserAgent(mContext, "yourApplicationName"));
-                    // This is the MediaSource representing the media to be played.
                     MediaSource videoSource = new ExtractorMediaSource.Factory(dataSourceFactory)
                             .createMediaSource(Uri.parse(item.getVideoUrl()));
-                    // Prepare the player with the source.
-                    player.setPlayWhenReady(true);
-                    player.setRepeatMode(Player.REPEAT_MODE_ONE);
+
                     player.prepare(videoSource);
-
-                    item.setVideoPlayer(player);
-
-                    playerView.setPlayer(item.getVideoPlayer());
+                    playerView.setPlayer(player);
                 }
             }
         }
