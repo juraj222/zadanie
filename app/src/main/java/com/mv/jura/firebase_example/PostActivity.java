@@ -268,6 +268,7 @@ public class PostActivity extends Activity {
             if(result != null) {
                 String filePath = "http://mobv.mcomputing.eu/upload/v/" + result;
             }
+            //createpost(PostType.image, "", "", "pokus_meno", Calendar.getInstance(), "user2");
         }
         private void createpost(PostType type, String videourl, String imageurl, String username, Calendar date, String userid){
             Map<String, Object> newItem = new HashMap<>();

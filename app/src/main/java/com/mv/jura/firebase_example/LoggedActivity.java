@@ -34,14 +34,13 @@ public class LoggedActivity extends AppCompatActivity {
     @Bind(R.id.recyclerView)
     RecyclerView mRecyclerView;
     private ListAdapter mAdapter;
-    public ArrayList<Item> items = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_logged);
         ButterKnife.bind(this);
-        items = populateProfiles();
+        populateProfiles();
         FloatingActionButton fab = findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -49,18 +48,15 @@ public class LoggedActivity extends AppCompatActivity {
                 startActivity(new Intent(LoggedActivity.this, PostActivity.class));
             }
         });
-        run();
+        //calback
+
     }
 
-    private ArrayList<Item> populateProfiles() {
-        items = getUserIds();
-        /*for (String userId: getUserIds()) {
-            items.add(new Item(userId));
-        }*/
-        return items;
+    private void populateProfiles() {
+        getUserIds();
     }
 
-    private ArrayList<Item> getUserIds(){
+    private void getUserIds(){
         //pole userId, ktory maju viac ako 0 prispevkov, zoradene podla casu posledneho prispevku // mozu sa opakovat
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         FirebaseFirestoreSettings settings = new FirebaseFirestoreSettings.Builder()
@@ -77,16 +73,15 @@ public class LoggedActivity extends AppCompatActivity {
                     for (QueryDocumentSnapshot doc : task.getResult()) {
                         items.add( new Item(doc.getString("userid")));
                     }
+                    run(items);
                 } else {
 
                 }
             }
         });
-
-        return items;
     }
 
-    public void run() {
+    public void run(ArrayList<Item> items) {
         mAdapter = new ListAdapter(getApplicationContext(), items);
         mRecyclerView.setAdapter(mAdapter);
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this,LinearLayoutManager.HORIZONTAL,false);

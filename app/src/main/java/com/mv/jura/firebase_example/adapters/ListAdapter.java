@@ -43,6 +43,8 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder>{
     private SimpleExoPlayer mPlayer;
     private FirebaseFirestore db;
     private int indexOfUserIds;
+    private final ArrayList<Item> items = new ArrayList<>();
+    private SubListAdapter mAdapter;
 
     public ListAdapter(Context context, ArrayList<Item> items) {
         mContext = context;
@@ -85,9 +87,7 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder>{
         public ViewHolder(View itemView) {
             super(itemView);
             mContext = itemView.getContext();
-            SubListAdapter mAdapter;
-            ArrayList<Item> items;
-            items = populateItems(mItems.get(indexOfUserIds++).getUserId());
+            populateItems(mItems.get(indexOfUserIds++).getUserId());
 
             RecyclerView mRecyclerView = itemView.findViewById(R.id.subRecyclerView);
 
@@ -112,10 +112,9 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder>{
 
     }
     //tu sa naplni profil a prispevky profilu
-    private ArrayList<Item> populateItems(String userId) {
-        ArrayList<Item> items = new ArrayList<>();
+    private void populateItems(String userId) {
         items.add(getProfile(userId)); //prida sa profil
-        items.addAll(getPosts(userId)); // pridaju sa prispevky pouzivatela
+     //   items.addAll(getPosts(userId)); // pridaju sa prispevky pouzivatela
 //        items.add(new Item("fero","10.1.2019", null,"5",null,null,true));
 //        items.add(new Item("fero",null, "12.1.2019",null,null,"http://clips.vorwaerts-gmbh.de/big_buck_bunny.mp4",false));
 //        items.add(new Item("fero",null, "13.1.2019",null,"http://i.imgur.com/e7MfwB0.jpg",null,false));
@@ -124,16 +123,31 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder>{
 //        createRegistration("pokus2", "user2");
 //        createpost(PostType.image, "", "http://i.imgur.com/e7MfwB0.jpg", "pokus2", Calendar.getInstance(), "user2");
 //        createpost(PostType.video, "http://clips.vorwaerts-gmbh.de/big_buck_bunny.mp4", "", "pokus2", Calendar.getInstance(), "user2");
-        return items;
     }
     private Item getProfile(String userId){
-        String name = null;
-        String registrationDate = null;
-        String postCount = null;
-
+        final Item item = new Item();
+        item.setProfile(true);
         // tu sa naplnia z DB tieto 3 stringy
+        DocumentReference user = db.collection("users").document(userId);
+        user.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if (task.isSuccessful()){
+                    DocumentSnapshot doc = task.getResult();
+                    item.setDate(doc.get("date").toString());
+                    item.setName(doc.getString("username"));
+                    item.setPostCount(doc.get("numberOfPosts").toString());
+                    mAdapter.notifyDataSetChanged();
+                }
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                e.printStackTrace();
+            }
+        });
 
-        return new Item(name,registrationDate, null,postCount,null,null,true);
+        return item;
     }
     private ArrayList<Item> getPosts(String userId){
         ArrayList<Item> items = new ArrayList<>();
