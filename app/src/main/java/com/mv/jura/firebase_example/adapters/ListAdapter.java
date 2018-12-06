@@ -114,7 +114,7 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder>{
     //tu sa naplni profil a prispevky profilu
     private void populateItems(String userId) {
         items.add(getProfile(userId)); //prida sa profil
-     //   items.addAll(getPosts(userId)); // pridaju sa prispevky pouzivatela
+        getPosts(userId); // pridaju sa prispevky pouzivatela
 //        items.add(new Item("fero","10.1.2019", null,"5",null,null,true));
 //        items.add(new Item("fero",null, "12.1.2019",null,null,"http://clips.vorwaerts-gmbh.de/big_buck_bunny.mp4",false));
 //        items.add(new Item("fero",null, "13.1.2019",null,"http://i.imgur.com/e7MfwB0.jpg",null,false));
@@ -149,11 +149,23 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder>{
 
         return item;
     }
-    private ArrayList<Item> getPosts(String userId){
-        ArrayList<Item> items = new ArrayList<>();
+    private void getPosts(String userId){
         // tu sa ziskaju posty z DB a pridaju sa do items, zoradene maju byt podla casu prispevku
         // items.add(new Item("fero",null, "13.1.2019",null,"http://i.imgur.com/e7MfwB0.jpg",null,false));
-        return items;
+        Query query = db.collection("posts").whereEqualTo("userid", userId);
+        query.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                if (task.isSuccessful()) {
+                    for (QueryDocumentSnapshot doc : task.getResult()) {
+                        items.add(new Item( doc.getString("username"), null, doc.get("date").toString(), null,doc.get("imageurl").toString(),doc.get("videourl").toString(),false));
+                    }
+                    mAdapter.notifyDataSetChanged();
+                } else {
+
+                }
+            }
+        });
     }
 
     private ArrayList<Item> getItems(String userId){
