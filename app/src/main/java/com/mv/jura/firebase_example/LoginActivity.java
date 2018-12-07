@@ -96,6 +96,7 @@ public class LoginActivity extends AppCompatActivity {
                                         Toast.makeText(LoginActivity.this, getString(R.string.auth_failed), Toast.LENGTH_LONG).show();
                                     }
                                 } else {
+                                    //TODO: auth.getUid()
                                     Intent intent = new Intent(LoginActivity.this, LoggedActivity.class);
                                     startActivity(intent);
                                     finish();

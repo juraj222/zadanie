@@ -26,6 +26,7 @@ import android.widget.VideoView;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreSettings;
 import com.mv.jura.firebase_example.adapters.PostType;
@@ -228,7 +229,7 @@ public class PostActivity extends Activity {
         @RequiresApi(api = Build.VERSION_CODES.M)
         @Override
         protected String doInBackground(Object... objects) {
-
+            createpost(PostType.image, "", "", "pokus_meno", Calendar.getInstance(), "user2");
             HttpClient httpClient = new DefaultHttpClient();
             HttpPost postRequest = new HttpPost("http://mobv.mcomputing.eu/upload/index.php");
             MultipartEntity reqEntity = new MultipartEntity(HttpMultipartMode.BROWSER_COMPATIBLE); //MultipartEntityBuilder je aktualna, ale nefunguje mi s httppost
@@ -268,7 +269,7 @@ public class PostActivity extends Activity {
             if(result != null) {
                 String filePath = "http://mobv.mcomputing.eu/upload/v/" + result;
             }
-            //createpost(PostType.image, "", "", "pokus_meno", Calendar.getInstance(), "user2");
+//            createpost(PostType.image, "", "", "pokus_meno", Calendar.getInstance(), "user2");
         }
         private void createpost(PostType type, String videourl, String imageurl, String username, Calendar date, String userid){
             Map<String, Object> newItem = new HashMap<>();
@@ -277,7 +278,7 @@ public class PostActivity extends Activity {
             newItem.put("imageurl", imageurl);
             newItem.put("username", username);
             newItem.put("userid", userid);
-            newItem.put("date",  new SimpleDateFormat("yyyyMMdd_HHmmss").format(date.getInstance().getTime()));
+            newItem.put("date",  FieldValue.serverTimestamp());
             db.collection("posts").document().set(newItem)
                     .addOnSuccessListener(new OnSuccessListener<Void>() {
                         @Override

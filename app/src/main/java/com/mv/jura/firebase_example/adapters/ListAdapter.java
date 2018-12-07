@@ -18,13 +18,16 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreSettings;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.google.type.Date;
 import com.mv.jura.firebase_example.Item;
 import com.mv.jura.firebase_example.R;
 
@@ -158,7 +161,8 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder>{
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
                 if (task.isSuccessful()) {
                     for (QueryDocumentSnapshot doc : task.getResult()) {
-                        items.add(new Item( doc.getString("username"), null, doc.get("date").toString(), null,doc.get("imageurl").toString(),doc.get("videourl").toString(),false));
+                        SimpleDateFormat dateFormatter = new SimpleDateFormat("E, y-M-d 'at' h:m:s a z");
+                        items.add(new Item( doc.getString("username"), null, ((Timestamp)doc.get("date")).toDate().toString(), null,doc.get("imageurl").toString(),doc.get("videourl").toString(),false));
                     }
                     mAdapter.notifyDataSetChanged();
                 } else {
