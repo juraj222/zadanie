@@ -64,10 +64,14 @@ public class PostActivity extends Activity {
     Bitmap photo;
     Uri videoUri;
     private FirebaseFirestore db;
+    String userId;
+    Item userProfile;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_post);
+        userId = getIntent().getSerializableExtra("userId").toString();
+        userProfile = (Item) getIntent().getSerializableExtra("userProfile");
         initDB();
         getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
         this.photoView = (ImageView)this.findViewById(R.id.photoView);
@@ -268,8 +272,14 @@ public class PostActivity extends Activity {
             //tu sa da nieco urobit ak sa dokonci upload fotky, result je nazov suboru
             if(result != null) {
                 String filePath = "http://mobv.mcomputing.eu/upload/v/" + result;
+
+                if(photoVideoMode == 1) {
+                    createpost(PostType.image, null, filePath, userProfile.name, Calendar.getInstance(), userId);
+                }else if(photoVideoMode == 2){
+                    createpost(PostType.video, filePath, null, userProfile.name, Calendar.getInstance(), userId);
+                }
             }
-//            createpost(PostType.image, "", "", "pokus_meno", Calendar.getInstance(), "user2");
+
         }
         private void createpost(PostType type, String videourl, String imageurl, String username, Calendar date, String userid){
             Map<String, Object> newItem = new HashMap<>();
@@ -284,11 +294,13 @@ public class PostActivity extends Activity {
                         @Override
                         public void onSuccess(Void aVoid) {
                             //tu by sa mala potom aktualizovat appka o novy prispevok
+                            System.out.println("upload success");
                         }
                     })
                     .addOnFailureListener(new OnFailureListener() {
                         @Override
                         public void onFailure(@NonNull Exception e) {
+                            System.out.println("error");
                         }
                     });
         }

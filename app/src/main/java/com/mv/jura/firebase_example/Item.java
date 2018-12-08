@@ -2,9 +2,10 @@ package com.mv.jura.firebase_example;
 
 import com.google.android.exoplayer2.ExoPlayer;
 
+import java.io.Serializable;
 import java.net.URI;
 
-public class Item {
+public class Item implements Serializable {
     String userId;
     String name;
     String date;

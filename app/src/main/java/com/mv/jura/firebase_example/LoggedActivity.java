@@ -13,6 +13,7 @@ import android.support.v7.widget.SnapHelper;
 import android.view.View;
 
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -34,18 +35,31 @@ public class LoggedActivity extends AppCompatActivity {
     @Bind(R.id.recyclerView)
     RecyclerView mRecyclerView;
     private ListAdapter mAdapter;
+    String userId;
+    FirebaseFirestore db;
+    Item userProfile;
+    Intent postActivityIntent;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_logged);
+        userId = getIntent().getSerializableExtra("userId").toString();
+        initDB();
+
         ButterKnife.bind(this);
         populateProfiles();
+
+        //plus tlacidlo
+
+
         FloatingActionButton fab = findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startActivity(new Intent(LoggedActivity.this, PostActivity.class));
+                postActivityIntent = new Intent(LoggedActivity.this, PostActivity.class);
+                postActivityIntent.putExtra("userId", userId);
+                postActivityIntent.putExtra("userProfile", (userProfile = getProfile(userId)));
             }
         });
         //calback
@@ -58,11 +72,6 @@ public class LoggedActivity extends AppCompatActivity {
 
     private void getUserIds(){
         //pole userId, ktory maju viac ako 0 prispevkov, zoradene podla casu posledneho prispevku // mozu sa opakovat
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
-        FirebaseFirestoreSettings settings = new FirebaseFirestoreSettings.Builder()
-                .setTimestampsInSnapshotsEnabled(true)
-                .build();
-        db.setFirestoreSettings(settings);
 
         final ArrayList<Item> items = new ArrayList<>();
         Query query = db.collection("posts");
@@ -79,6 +88,40 @@ public class LoggedActivity extends AppCompatActivity {
                 }
             }
         });
+    }
+
+    private Item getProfile(String userId){
+        final Item item = new Item(userId);
+        item.setProfile(true);
+        DocumentReference user = db.collection("users").document(userId);
+        user.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if (task.isSuccessful()){
+                    DocumentSnapshot doc = task.getResult();
+                    item.setDate(doc.get("date").toString());
+                    item.setName(doc.getString("username"));
+                    item.setPostCount(doc.get("numberOfPosts").toString());
+                    startActivity(postActivityIntent);
+                }
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                e.printStackTrace();
+            }
+        });
+
+        return item;
+    }
+
+    private void initDB(){
+        // Access a Cloud Firestore instance from your Activity
+        db = FirebaseFirestore.getInstance();
+        FirebaseFirestoreSettings settings = new FirebaseFirestoreSettings.Builder()
+                .setTimestampsInSnapshotsEnabled(true)
+                .build();
+        db.setFirestoreSettings(settings);
     }
 
     public void run(ArrayList<Item> items) {
