@@ -74,13 +74,15 @@ public class LoggedActivity extends AppCompatActivity {
         //pole userId, ktory maju viac ako 0 prispevkov, zoradene podla casu posledneho prispevku // mozu sa opakovat
 
         final ArrayList<Item> items = new ArrayList<>();
-        Query query = db.collection("posts").orderBy("date");
+        Query query = db.collection("posts").orderBy("date", Query.Direction.ASCENDING);
         query.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
                 if (task.isSuccessful()) {
                     for (QueryDocumentSnapshot doc : task.getResult()) {
-                        items.add( new Item(doc.getString("userid")));
+                        Item item = new Item(doc.getString("userid"));
+                        item.setDate(doc.getDate("date").toString());
+                        items.add(item);
                     }
                     run(items);
                 } else {

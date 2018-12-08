@@ -94,7 +94,7 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder>{
             this.itemView = itemView;
             mContext = itemView.getContext();
 
-            items = populateItems(mItems.get(indexOfUserIds++).getUserId(), new LoadedChecker(), this);
+            items = populateItems(mItems.get(indexOfUserIds++), new LoadedChecker(), this);
 
         }
         private void run(){
@@ -119,10 +119,10 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder>{
     }
 
     //tu sa naplni profil a prispevky profilu
-    private ArrayList<Item> populateItems(String userId, LoadedChecker loadedChecker, ViewHolder viewHolder) {
+    private ArrayList<Item> populateItems(Item actualItem, LoadedChecker loadedChecker, ViewHolder viewHolder) {
         ArrayList<Item> items = new ArrayList<>();
-        items.add(getProfile(userId, loadedChecker, viewHolder)); //prida sa profil
-        getPosts(userId,items, loadedChecker, viewHolder); // pridaju sa prispevky pouzivatela
+        items.add(getProfile(actualItem.getUserId(), loadedChecker, viewHolder)); //prida sa profil
+        getPosts(actualItem,items, loadedChecker, viewHolder); // pridaju sa prispevky pouzivatela
         return items;
 //        items.add(new Item("fero","10.1.2019", null,"5",null,null,true));
 //        items.add(new Item("fero",null, "12.1.2019",null,null,"http://clips.vorwaerts-gmbh.de/big_buck_bunny.mp4",false));
@@ -163,10 +163,10 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder>{
 
         return item;
     }
-    private void getPosts(String userId, final ArrayList<Item> items, final LoadedChecker loadedChecker, final ViewHolder viewHolder){
+    private void getPosts(Item actualItem, final ArrayList<Item> items, final LoadedChecker loadedChecker, final ViewHolder viewHolder){
         // tu sa ziskaju posty z DB a pridaju sa do items, zoradene maju byt podla casu prispevku
         // items.add(new Item("fero",null, "13.1.2019",null,"http://i.imgur.com/e7MfwB0.jpg",null,false));
-        Query query = db.collection("posts").whereEqualTo("userid", userId);
+        Query query = db.collection("posts").whereEqualTo("userid", actualItem.getUserId());
         query.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
@@ -184,68 +184,5 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder>{
                 }
             }
         });
-    }
-
-    private ArrayList<Item> getItems(String userId){
-        final ArrayList<Item> items = new ArrayList<>();
-        DocumentReference user = db.collection("users").document(userId);
-        user.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                if (task.isSuccessful()){
-                    DocumentSnapshot doc = task.getResult();
-                    items.add(new Item( doc.getString("username"),doc.get("date").toString(), null,doc.get("numberOfPosts").toString(),null,null,true));
-                }
-            }
-        }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                e.printStackTrace();
-            }
-        });
-
-        Query query = db.collection("posts").whereEqualTo("userid", "user2");
-        query.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                if (task.isSuccessful()) {
-                    for (QueryDocumentSnapshot doc : task.getResult()) {
-                        items.add(new Item( doc.getString("username"), null, doc.get("date").toString(), null,doc.get("imageurl").toString(),doc.get("videourl").toString(),false));
-                    }
-                } else {
-
-                }
-            }
-        });
-        return items;
-    }
-
-
-    private void createRegistration(String name, String userId){
-        Map<String, Object> newItem = new HashMap<>();
-        newItem.put("username", name);
-        newItem.put("date",  new SimpleDateFormat("yyyyMMdd_HHmmss").format(Calendar.getInstance().getTime()));
-        newItem.put("numberOfPosts", 0);
-        db.collection("users").document(userId).set(newItem)
-                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                    @Override
-                    public void onSuccess(Void aVoid) {
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                    }
-                });
-    }
-
-    private void UpdateRegistration(int numberOfPosts, String userId) {
-        DocumentReference contact = db.collection("users").document(userId);
-        contact.update("numberOfPosts", numberOfPosts)
-                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                    @Override
-                    public void onSuccess(Void aVoid) {
-                    }
-                });
     }
 }
