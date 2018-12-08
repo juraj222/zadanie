@@ -26,6 +26,7 @@ import android.widget.VideoView;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreSettings;
@@ -295,12 +296,23 @@ public class PostActivity extends Activity {
                         public void onSuccess(Void aVoid) {
                             //tu by sa mala potom aktualizovat appka o novy prispevok
                             System.out.println("upload success");
+                            UpdateRegistration(Integer.parseInt(userProfile.getPostCount()) + 1, userId);
                         }
                     })
                     .addOnFailureListener(new OnFailureListener() {
                         @Override
                         public void onFailure(@NonNull Exception e) {
                             System.out.println("error");
+                        }
+                    });
+        }
+        private void UpdateRegistration(int numberOfPosts, String userId) {
+            DocumentReference contact = db.collection("users").document(userId);
+            contact.update("numberOfPosts", numberOfPosts)
+                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                        @Override
+                        public void onSuccess(Void aVoid) {
+                            //userProfile.setPostCount(((int)(Integer.parseInt(userProfile.getPostCount()) + 1)).toString());
                         }
                     });
         }
