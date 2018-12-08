@@ -4,11 +4,13 @@ import com.google.android.exoplayer2.ExoPlayer;
 
 import java.io.Serializable;
 import java.net.URI;
+import java.util.Date;
 
 public class Item implements Serializable {
     String userId;
     String name;
     String date;
+    Date dateObject;
     String registrationDate;
     String postCount;
     String imageUrl;
@@ -30,6 +32,14 @@ public class Item implements Serializable {
         this.imageUrl = imageUrl;
         this.videoUrl = videoUrl;
         this.isProfile = isProfile;
+    }
+
+    public Date getDateObject() {
+        return dateObject;
+    }
+
+    public void setDateObject(Date dateObject) {
+        this.dateObject = dateObject;
     }
 
     public String getUserId() {

@@ -234,7 +234,7 @@ public class PostActivity extends Activity {
         @RequiresApi(api = Build.VERSION_CODES.M)
         @Override
         protected String doInBackground(Object... objects) {
-            createpost(PostType.image, "", "", "pokus_meno", Calendar.getInstance(), "user2");
+            //createpost(PostType.image, "", "", "pokus_meno", Calendar.getInstance(), "user2");
             HttpClient httpClient = new DefaultHttpClient();
             HttpPost postRequest = new HttpPost("http://mobv.mcomputing.eu/upload/index.php");
             MultipartEntity reqEntity = new MultipartEntity(HttpMultipartMode.BROWSER_COMPATIBLE); //MultipartEntityBuilder je aktualna, ale nefunguje mi s httppost
@@ -313,6 +313,7 @@ public class PostActivity extends Activity {
                         @Override
                         public void onSuccess(Void aVoid) {
                             //userProfile.setPostCount(((int)(Integer.parseInt(userProfile.getPostCount()) + 1)).toString());
+                            //onBackPressed();
                         }
                     });
         }

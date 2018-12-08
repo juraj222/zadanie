@@ -166,7 +166,7 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder>{
     private void getPosts(Item actualItem, final ArrayList<Item> items, final LoadedChecker loadedChecker, final ViewHolder viewHolder){
         // tu sa ziskaju posty z DB a pridaju sa do items, zoradene maju byt podla casu prispevku
         // items.add(new Item("fero",null, "13.1.2019",null,"http://i.imgur.com/e7MfwB0.jpg",null,false));
-        Query query = db.collection("posts").whereGreaterThanOrEqualTo("date", actualItem.getDate()).whereEqualTo("userid", actualItem.getUserId());
+        Query query = db.collection("posts").whereGreaterThanOrEqualTo("date", new Timestamp(actualItem.getDateObject()) ).whereEqualTo("userid", actualItem.getUserId());
         query.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
@@ -180,7 +180,7 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder>{
                     }
                     //mAdapter.notifyDataSetChanged();
                 } else {
-
+                    System.out.println();
                 }
             }
         });

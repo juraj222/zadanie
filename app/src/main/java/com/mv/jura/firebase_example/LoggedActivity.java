@@ -1,6 +1,7 @@
 package com.mv.jura.firebase_example;
 
 import android.content.Intent;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -15,10 +16,13 @@ import android.view.View;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -39,6 +43,7 @@ public class LoggedActivity extends AppCompatActivity {
     FirebaseFirestore db;
     Item userProfile;
     Intent postActivityIntent;
+    final ArrayList<Item> items = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,8 +56,6 @@ public class LoggedActivity extends AppCompatActivity {
         populateProfiles();
 
         //plus tlacidlo
-
-
         FloatingActionButton fab = findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -62,8 +65,55 @@ public class LoggedActivity extends AppCompatActivity {
                 postActivityIntent.putExtra("userProfile", (userProfile = getProfile(userId)));
             }
         });
-        //calback
+        /*runOnUiThread(new Runnable() {
+            public void run() {
 
+                Timer t = new Timer();
+                t.schedule(new TimerTask() {
+                    @Override
+                    public void run() {
+                        ActualizeItems();
+                    }
+                }, 0, 5000); // kazdych 5sekund aktualizuje;
+            }
+        });*/
+        final Handler handler = new Handler();
+        final int delay = 5000; //milliseconds
+
+        handler.postDelayed(new Runnable(){
+            public void run(){
+                if(items != null && items.size() > 0) {
+                    ActualizeItems();
+                }
+                handler.postDelayed(this, delay);
+            }
+        }, delay);
+
+
+    }
+    public void ActualizeItems(){
+        //Query query = db.collection("posts").orderBy("date"); //where date < items[0].getDate();
+        Query query = db.collection("posts").whereGreaterThan("date", new Timestamp(items.get(0).getDateObject()) );
+        query.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                if (task.isSuccessful()) {
+                    boolean foundNew = false;
+                    for (QueryDocumentSnapshot doc : task.getResult()) {
+                        foundNew = true;
+                        Item item = new Item(doc.getString("userid"));
+                        item.setDate(doc.getDate("date").toString());
+                        item.setDateObject(doc.getDate("date"));
+                        items.add(0,item);
+                    }
+                    if(foundNew) {
+                        //mAdapter.notifyDataSetChanged();
+                    }
+                } else {
+                    System.out.println();
+                }
+            }
+        });
     }
 
     private void populateProfiles() {
@@ -73,8 +123,7 @@ public class LoggedActivity extends AppCompatActivity {
     private void getUserIds(){
         //pole userId, ktory maju viac ako 0 prispevkov, zoradene podla casu posledneho prispevku // mozu sa opakovat
 
-        final ArrayList<Item> items = new ArrayList<>();
-        Query query = db.collection("posts").orderBy("date", Query.Direction.ASCENDING);
+        Query query = db.collection("posts").orderBy("date", Query.Direction.DESCENDING);
         query.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
@@ -82,6 +131,7 @@ public class LoggedActivity extends AppCompatActivity {
                     for (QueryDocumentSnapshot doc : task.getResult()) {
                         Item item = new Item(doc.getString("userid"));
                         item.setDate(doc.getDate("date").toString());
+                        item.setDateObject(doc.getDate("date"));
                         items.add(item);
                     }
                     run(items);
