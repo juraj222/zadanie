@@ -2,6 +2,7 @@ package com.mv.jura.firebase_example;
 
 import android.Manifest;
 import android.app.Activity;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -19,6 +20,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
+import android.webkit.MimeTypeMap;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Toast;
@@ -48,6 +50,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.net.URLConnection;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.HashMap;
@@ -56,6 +59,7 @@ import java.util.concurrent.TimeUnit;
 
 public class PostActivity extends Activity {
     private static final int CAMERA_REQUEST = 1888;
+    private static final int GALLERY_REQUEST = 1880;
     private static final int STORAGE_REQUEST = 1889;
     private ImageView photoView;
     private VideoView videoView;
@@ -116,6 +120,25 @@ public class PostActivity extends Activity {
                 }
             }
         });
+        Button galleryButton = (Button) this.findViewById(R.id.gallery);
+        galleryButton.setOnClickListener(new View.OnClickListener() {
+
+            @RequiresApi(api = Build.VERSION_CODES.M)
+            @Override
+            public void onClick(View v) {
+                photoVideoMode = 0;
+                if (checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE)
+                        != PackageManager.PERMISSION_GRANTED) {
+                    requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
+                            MY_CAMERA_PERMISSION_CODE);
+                } else {
+                    Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                    intent.setType("image/* video/*");
+                    //Intent cameraIntent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                    startActivityForResult(intent, GALLERY_REQUEST);
+                }
+            }
+        });
         Button shareButton = (Button) this.findViewById(R.id.shareButton);
         shareButton.setOnClickListener(new View.OnClickListener() {
 
@@ -126,17 +149,11 @@ public class PostActivity extends Activity {
                         != PackageManager.PERMISSION_GRANTED) {
                     requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
                             MY_STORAGE_PERMISSION_CODE);
-                } else {
-                    Intent permissionIntent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
-                    startActivityForResult(permissionIntent, STORAGE_REQUEST);
                 }
                 if (checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
                         != PackageManager.PERMISSION_GRANTED) {
                     requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
                             MY_STORAGE_PERMISSION_CODE);
-                }else {
-                    Intent permissionIntent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
-                    startActivityForResult(permissionIntent, STORAGE_REQUEST);
                 }
                 if(photoVideoMode == 1) {
 
@@ -206,7 +223,39 @@ public class PostActivity extends Activity {
                 photoView.setVisibility(View.INVISIBLE);
                 videoView.setVisibility(View.INVISIBLE);
             }
+        }else if(requestCode == GALLERY_REQUEST && resultCode == Activity.RESULT_OK){
+            Uri uri = data.getData();
+            String mimeType = getMimeType(uri);
+            if(mimeType != null && mimeType.startsWith("image")){
+                photoView.setVisibility(View.VISIBLE);
+                videoView.setVisibility(View.INVISIBLE);
+                photoView.setImageURI(uri);
+                photoVideoMode = 1;
+            }else if(mimeType != null && mimeType.startsWith("video")){
+                photoView.setVisibility(View.INVISIBLE);
+                videoView.setVisibility(View.VISIBLE);
+                videoView.setVideoURI(uri);
+                videoView.start();
+                photoVideoMode = 2;
+            }else{
+                photoView.setVisibility(View.INVISIBLE);
+                videoView.setVisibility(View.INVISIBLE);
+            }
         }
+    }
+
+    public String getMimeType(Uri uri) {
+        String mimeType = null;
+        if (uri.getScheme().equals(ContentResolver.SCHEME_CONTENT)) {
+            ContentResolver cr = this.getContentResolver();
+            mimeType = cr.getType(uri);
+        } else {
+            String fileExtension = MimeTypeMap.getFileExtensionFromUrl(uri
+                    .toString());
+            mimeType = MimeTypeMap.getSingleton().getMimeTypeFromExtension(
+                    fileExtension.toLowerCase());
+        }
+        return mimeType;
     }
 
     @Override

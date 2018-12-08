@@ -99,15 +99,20 @@ public class LoggedActivity extends AppCompatActivity {
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
                 if (task.isSuccessful()) {
                     boolean foundNew = false;
+                    //int previousContentSize = items.size();
+                    int insered = 0;
                     for (QueryDocumentSnapshot doc : task.getResult()) {
                         foundNew = true;
                         Item item = new Item(doc.getString("userid"));
                         item.setDate(doc.getDate("date").toString());
                         item.setDateObject(doc.getDate("date"));
                         items.add(0,item);
+                        insered++;
                     }
                     if(foundNew) {
                         //mAdapter.notifyDataSetChanged();
+                        //mAdapter.notifyItemRangeRemoved(0, previousContentSize);
+                        mAdapter.notifyItemRangeInserted(0,insered);
                     }
                 } else {
                     System.out.println();
