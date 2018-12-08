@@ -4,7 +4,6 @@ import android.content.Intent;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
@@ -12,13 +11,9 @@ import android.support.v7.widget.PagerSnapHelper;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SnapHelper;
 import android.view.View;
-import android.widget.ListView;
 
 
-import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Timer;
-import java.util.TimerTask;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -32,6 +27,7 @@ import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.mv.jura.firebase_example.adapters.ListAdapter;
+
 import butterknife.Bind;
 import butterknife.ButterKnife;
 
@@ -43,6 +39,7 @@ public class LoggedActivity extends AppCompatActivity {
     String userId;
     FirebaseFirestore db;
     Item userProfile;
+    Boolean loaded = false;
     Intent postActivityIntent;
     final ArrayList<Item> items = new ArrayList<>();
 
@@ -62,6 +59,7 @@ public class LoggedActivity extends AppCompatActivity {
             public void onClick(View view) {
                 postActivityIntent = new Intent(LoggedActivity.this, PostActivity.class);
                 postActivityIntent.putExtra("userId", userId);
+                //postActivityIntent.putExtra("loaded", loaded);
                 postActivityIntent.putExtra("userProfile", (userProfile = getProfile(userId)));
             }
         });
@@ -79,21 +77,22 @@ public class LoggedActivity extends AppCompatActivity {
         });*/
         final Handler handler = new Handler();
         final int delay = 5000; //milliseconds
-/*
+
         handler.postDelayed(new Runnable(){
             public void run(){
-                if(items != null && items.size() > 0) {
+                if(items != null && items.size() > 0 && loaded) {
                     ActualizeItems();
                 }
                 handler.postDelayed(this, delay);
             }
-        }, delay);*/
+        }, delay);
 
 
     }
     public void ActualizeItems(){
         //Query query = db.collection("posts").orderBy("date"); //where date < items[0].getDate();
         Query query = db.collection("posts").whereGreaterThan("date", new Timestamp(items.get(0).getDateObject()) );
+        //loaded = false;
         query.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
@@ -102,6 +101,9 @@ public class LoggedActivity extends AppCompatActivity {
                     //int previousContentSize = items.size();
                     int insered = 0;
                     for (QueryDocumentSnapshot doc : task.getResult()) {
+                        if(doc.getDate("date") == null){
+                            break;
+                        }
                         foundNew = true;
                         Item item = new Item(doc.getString("userid"));
                         item.setDate(doc.getDate("date").toString());
@@ -110,13 +112,13 @@ public class LoggedActivity extends AppCompatActivity {
                         insered++;
                     }
                     if(foundNew) {
-                        //mAdapter.notifyDataSetChanged();
-                        //mAdapter.notifyItemRangeRemoved(0, previousContentSize);
-                        mAdapter.notifyItemRangeInserted(0,insered);
+                        mRecyclerView.scrollToPosition(0); //ak tu toto nebude, tak sa dolava da iny prispevok, weird
+                        mAdapter.notifyItemInserted(0);
                     }
                 } else {
                     System.out.println();
                 }
+                //loaded = true;
             }
         });
     }
@@ -191,5 +193,6 @@ public class LoggedActivity extends AppCompatActivity {
         //https://stackoverflow.com/questions/32324926/swipe-one-item-at-a-time-recyclerview
         SnapHelper snapHelper = new PagerSnapHelper();
         snapHelper.attachToRecyclerView(mRecyclerView);
+        loaded = true;
     }
 }

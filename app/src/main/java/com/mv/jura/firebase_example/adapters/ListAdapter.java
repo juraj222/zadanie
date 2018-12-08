@@ -46,7 +46,7 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder>{
     private SimpleExoPlayer mPlayer;
     private FirebaseFirestore db;
     private int indexOfUserIds;
-
+    private int position;
     private SubListAdapter mAdapter;
 
     public ListAdapter(Context context, ArrayList<Item> items) {
@@ -85,6 +85,7 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder>{
 
     @Override
     public int getItemViewType(int position) {
+        this.position = position;
         return position;
     }
 
@@ -101,10 +102,11 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder>{
 
         public ViewHolder(View itemView) {
             super(itemView);
+            int i = getAdapterPosition();
             this.itemView = itemView;
             mContext = itemView.getContext();
             //setIsRecyclable(false);
-            items = populateItems(mItems.get(indexOfUserIds++), new LoadedChecker(), this);
+            items = populateItems(mItems.get(position), new LoadedChecker(), this);
 
         }
         private void run(){

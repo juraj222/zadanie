@@ -1,9 +1,9 @@
 package com.mv.jura.firebase_example;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.ContentResolver;
-import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
@@ -14,9 +14,6 @@ import android.os.Build;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.annotation.RequiresApi;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
@@ -41,7 +38,6 @@ import org.apache.http.entity.mime.HttpMultipartMode;
 import org.apache.http.entity.mime.MultipartEntity;
 import org.apache.http.entity.mime.content.ByteArrayBody;
 import org.apache.http.entity.mime.content.FileBody;
-import org.apache.http.entity.mime.content.StringBody;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.json.JSONObject;
 
@@ -50,8 +46,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.net.URLConnection;
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
@@ -71,12 +65,16 @@ public class PostActivity extends Activity {
     private FirebaseFirestore db;
     String userId;
     Item userProfile;
+    //LoadedClass loaded;
+    Boolean loaded;
+    @SuppressLint("NewApi")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_post);
         userId = getIntent().getSerializableExtra("userId").toString();
         userProfile = (Item) getIntent().getSerializableExtra("userProfile");
+        //loaded =  getIntent().getExtras().getParcelable("loaded");
         initDB();
         getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
         this.photoView = (ImageView)this.findViewById(R.id.photoView);
@@ -227,11 +225,17 @@ public class PostActivity extends Activity {
             Uri uri = data.getData();
             String mimeType = getMimeType(uri);
             if(mimeType != null && mimeType.startsWith("image")){
+                try {
+                    this.photo = MediaStore.Images.Media.getBitmap(this.getContentResolver(), uri);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
                 photoView.setVisibility(View.VISIBLE);
                 videoView.setVisibility(View.INVISIBLE);
                 photoView.setImageURI(uri);
                 photoVideoMode = 1;
             }else if(mimeType != null && mimeType.startsWith("video")){
+                this.videoUri = uri;
                 photoView.setVisibility(View.INVISIBLE);
                 videoView.setVisibility(View.VISIBLE);
                 videoView.setVideoURI(uri);
@@ -351,7 +355,7 @@ public class PostActivity extends Activity {
                     .addOnFailureListener(new OnFailureListener() {
                         @Override
                         public void onFailure(@NonNull Exception e) {
-                            System.out.println("error");
+                            System.out.println(e.getMessage());
                         }
                     });
         }
@@ -363,6 +367,7 @@ public class PostActivity extends Activity {
                         public void onSuccess(Void aVoid) {
                             //userProfile.setPostCount(((int)(Integer.parseInt(userProfile.getPostCount()) + 1)).toString());
                             //onBackPressed();
+                            //loaded = true;
                         }
                     });
         }
