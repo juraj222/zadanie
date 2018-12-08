@@ -12,6 +12,7 @@ import android.support.v7.widget.PagerSnapHelper;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SnapHelper;
 import android.view.View;
+import android.widget.ListView;
 
 
 import java.io.Serializable;
@@ -51,7 +52,6 @@ public class LoggedActivity extends AppCompatActivity {
         setContentView(R.layout.activity_logged);
         userId = getIntent().getSerializableExtra("userId").toString();
         initDB();
-
         ButterKnife.bind(this);
         populateProfiles();
 
@@ -79,7 +79,7 @@ public class LoggedActivity extends AppCompatActivity {
         });*/
         final Handler handler = new Handler();
         final int delay = 5000; //milliseconds
-
+/*
         handler.postDelayed(new Runnable(){
             public void run(){
                 if(items != null && items.size() > 0) {
@@ -87,7 +87,7 @@ public class LoggedActivity extends AppCompatActivity {
                 }
                 handler.postDelayed(this, delay);
             }
-        }, delay);
+        }, delay);*/
 
 
     }
@@ -184,9 +184,10 @@ public class LoggedActivity extends AppCompatActivity {
     public void run(ArrayList<Item> items) {
         mAdapter = new ListAdapter(getApplicationContext(), items);
         mRecyclerView.setAdapter(mAdapter);
+        //mListView.setAdapter(mAdapter);
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this,LinearLayoutManager.HORIZONTAL,false);
         mRecyclerView.setLayoutManager(layoutManager);
-        mRecyclerView.setHasFixedSize(true);
+        //mRecyclerView.setHasFixedSize(true);
         //https://stackoverflow.com/questions/32324926/swipe-one-item-at-a-time-recyclerview
         SnapHelper snapHelper = new PagerSnapHelper();
         snapHelper.attachToRecyclerView(mRecyclerView);

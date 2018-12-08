@@ -77,6 +77,16 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder>{
     public void onBindViewHolder(ListAdapter.ViewHolder holder, int position) {
         holder.bindItem(mItems.get(position));
     }
+    //https://stackoverflow.com/questions/33316837/how-to-prevent-items-from-getting-duplicated-when-scrolling-recycler-view
+    @Override
+    public long getItemId(int position) {
+        return position;
+    }
+
+    @Override
+    public int getItemViewType(int position) {
+        return position;
+    }
 
     @Override
     public int getItemCount() {
@@ -93,7 +103,7 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder>{
             super(itemView);
             this.itemView = itemView;
             mContext = itemView.getContext();
-
+            //setIsRecyclable(false);
             items = populateItems(mItems.get(indexOfUserIds++), new LoadedChecker(), this);
 
         }
