@@ -46,7 +46,7 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder>{
     private SimpleExoPlayer mPlayer;
     private FirebaseFirestore db;
     private int indexOfUserIds;
-    private final ArrayList<Item> items = new ArrayList<>();
+
     private SubListAdapter mAdapter;
 
     public ListAdapter(Context context, ArrayList<Item> items) {
@@ -86,14 +86,19 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder>{
         //@Bind(R.id.itemTextView) TextView itemTextView;
 
         private Context mContext;
+        private ArrayList<Item> items;
+        View itemView;
 
         public ViewHolder(View itemView) {
             super(itemView);
+            this.itemView = itemView;
             mContext = itemView.getContext();
-            populateItems(mItems.get(indexOfUserIds++).getUserId());
 
+            items = populateItems(mItems.get(indexOfUserIds++).getUserId(), new LoadedChecker(), this);
+
+        }
+        private void run(){
             RecyclerView mRecyclerView = itemView.findViewById(R.id.subRecyclerView);
-
             mAdapter = new SubListAdapter(mContext, items, mPlayer);
             mRecyclerView.setAdapter(mAdapter);
             RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(mContext);
@@ -105,19 +110,20 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder>{
             snapHelper.attachToRecyclerView(mRecyclerView);
 
             ButterKnife.bind(this, itemView);
-
         }
-
         public void bindItem(Item item) {
             //itemTextView.setText(item.getName());
         }
 
 
     }
+
     //tu sa naplni profil a prispevky profilu
-    private void populateItems(String userId) {
-        items.add(getProfile(userId)); //prida sa profil
-        getPosts(userId); // pridaju sa prispevky pouzivatela
+    private ArrayList<Item> populateItems(String userId, LoadedChecker loadedChecker, ViewHolder viewHolder) {
+        ArrayList<Item> items = new ArrayList<>();
+        items.add(getProfile(userId, loadedChecker, viewHolder)); //prida sa profil
+        getPosts(userId,items, loadedChecker, viewHolder); // pridaju sa prispevky pouzivatela
+        return items;
 //        items.add(new Item("fero","10.1.2019", null,"5",null,null,true));
 //        items.add(new Item("fero",null, "12.1.2019",null,null,"http://clips.vorwaerts-gmbh.de/big_buck_bunny.mp4",false));
 //        items.add(new Item("fero",null, "13.1.2019",null,"http://i.imgur.com/e7MfwB0.jpg",null,false));
@@ -127,7 +133,7 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder>{
 //        createpost(PostType.image, "", "http://i.imgur.com/e7MfwB0.jpg", "pokus2", Calendar.getInstance(), "user2");
 //        createpost(PostType.video, "http://clips.vorwaerts-gmbh.de/big_buck_bunny.mp4", "", "pokus2", Calendar.getInstance(), "user2");
     }
-    private Item getProfile(String userId){
+    private Item getProfile(String userId, final LoadedChecker loadedChecker, final ViewHolder viewHolder){
         final Item item = new Item();
         item.setProfile(true);
         // tu sa naplnia z DB tieto 3 stringy
@@ -141,7 +147,11 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder>{
                     item.setName(doc.getString("username"));
                     item.setPostCount(doc.get("numberOfPosts").toString());
                     item.setProfile(true);
-                    mAdapter.notifyDataSetChanged();
+                    //mAdapter.notifyDataSetChanged();
+                    loadedChecker.setProfileLoaded(true);
+                    if(loadedChecker.getPostsLoaded()){
+                        viewHolder.run();
+                    }
                 }
             }
         }).addOnFailureListener(new OnFailureListener() {
@@ -153,7 +163,7 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder>{
 
         return item;
     }
-    private void getPosts(String userId){
+    private void getPosts(String userId, final ArrayList<Item> items, final LoadedChecker loadedChecker, final ViewHolder viewHolder){
         // tu sa ziskaju posty z DB a pridaju sa do items, zoradene maju byt podla casu prispevku
         // items.add(new Item("fero",null, "13.1.2019",null,"http://i.imgur.com/e7MfwB0.jpg",null,false));
         Query query = db.collection("posts").whereEqualTo("userid", userId);
@@ -164,7 +174,11 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder>{
                     for (QueryDocumentSnapshot doc : task.getResult()) {
                         items.add(new Item( doc.getString("username"), null, ((Timestamp)doc.get("date")).toDate().toString(), null,doc.get("imageurl").toString(),doc.get("videourl").toString(),false));
                     }
-                    mAdapter.notifyDataSetChanged();
+                    loadedChecker.setPostsLoaded(true);
+                    if(loadedChecker.getProfileLoaded()){
+                        viewHolder.run();
+                    }
+                    //mAdapter.notifyDataSetChanged();
                 } else {
 
                 }
