@@ -65,7 +65,7 @@ public class LoggedActivity extends AppCompatActivity {
         db.setFirestoreSettings(settings);
 
         final ArrayList<Item> items = new ArrayList<>();
-        Query query = db.collection("posts");
+        Query query = db.collection("posts").orderBy("date");
         query.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
