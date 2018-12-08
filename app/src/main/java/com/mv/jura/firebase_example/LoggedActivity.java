@@ -74,7 +74,7 @@ public class LoggedActivity extends AppCompatActivity {
         //pole userId, ktory maju viac ako 0 prispevkov, zoradene podla casu posledneho prispevku // mozu sa opakovat
 
         final ArrayList<Item> items = new ArrayList<>();
-        Query query = db.collection("posts");
+        Query query = db.collection("posts").orderBy("date");
         query.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
             public void onComplete(@NonNull Task<QuerySnapshot> task) {

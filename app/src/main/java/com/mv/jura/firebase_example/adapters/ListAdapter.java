@@ -140,6 +140,7 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder>{
                     item.setDate(doc.get("date").toString());
                     item.setName(doc.getString("username"));
                     item.setPostCount(doc.get("numberOfPosts").toString());
+                    item.setProfile(true);
                     mAdapter.notifyDataSetChanged();
                 }
             }
@@ -161,7 +162,6 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder>{
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
                 if (task.isSuccessful()) {
                     for (QueryDocumentSnapshot doc : task.getResult()) {
-                        SimpleDateFormat dateFormatter = new SimpleDateFormat("E, y-M-d 'at' h:m:s a z");
                         items.add(new Item( doc.getString("username"), null, ((Timestamp)doc.get("date")).toDate().toString(), null,doc.get("imageurl").toString(),doc.get("videourl").toString(),false));
                     }
                     mAdapter.notifyDataSetChanged();
