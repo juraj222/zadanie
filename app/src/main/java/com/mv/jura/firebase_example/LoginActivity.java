@@ -110,7 +110,7 @@ public class LoginActivity extends AppCompatActivity {
                                     prefs.edit().putString("email", email).apply();
                                     prefs.edit().putString("password", password).apply();
                                     Intent intent = new Intent(LoginActivity.this, LoggedActivity.class);
-                                    intent.putExtra("userId", email);
+                                    intent.putExtra("userId", auth.getUid());
                                     startActivity(intent);
                                     finish();
                                 }

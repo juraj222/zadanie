@@ -274,9 +274,9 @@ public class PostActivity extends Activity {
                 String filePath = "http://mobv.mcomputing.eu/upload/v/" + result;
 
                 if(photoVideoMode == 1) {
-                    createpost(PostType.image, null, filePath, userProfile.name, Calendar.getInstance(), userId);
+                    createpost(PostType.image, "", filePath, userProfile.name, Calendar.getInstance(), userId);
                 }else if(photoVideoMode == 2){
-                    createpost(PostType.video, filePath, null, userProfile.name, Calendar.getInstance(), userId);
+                    createpost(PostType.video, filePath, "", userProfile.name, Calendar.getInstance(), userId);
                 }
             }
 
