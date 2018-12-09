@@ -156,7 +156,7 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder>{
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                 if (task.isSuccessful()){
                     DocumentSnapshot doc = task.getResult();
-                    item.setDate(doc.get("date").toString());
+                    item.setRegistrationDate(((Timestamp)doc.get("date")).toDate().toString());
                     item.setName(doc.getString("username"));
                     item.setPostCount(doc.get("numberOfPosts").toString());
                     item.setProfile(true);
