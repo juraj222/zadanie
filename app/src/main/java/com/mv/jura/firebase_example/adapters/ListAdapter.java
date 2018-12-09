@@ -73,6 +73,7 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder>{
         return viewHolder;
     }
 
+
     @Override
     public void onBindViewHolder(ListAdapter.ViewHolder holder, int position) {
         holder.bindItem(mItems.get(position));
@@ -193,7 +194,7 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder>{
                     }
                     //mAdapter.notifyDataSetChanged();
                 } else {
-                    System.out.println();
+                    task.getException().printStackTrace();
                 }
             }
         });
