@@ -95,7 +95,7 @@ public class SubListAdapter extends RecyclerView.Adapter<SubListAdapter.ViewHold
                 relativeLayoutVideoPost.setVisibility(View.INVISIBLE);
                 relativeLayoutImagePost.setVisibility(View.INVISIBLE);
                 textViewProfileName.setText(item.getName());
-                textViewProfileDate.setText(item.getRegistrationDate());
+                textViewProfileDate.setText(item.getRegistrationDateFormated());
                 textViewProfilePostCount.setText(item.getPostCount());
             }else{
                 if (item.getImageUrl() != null && !item.getImageUrl().isEmpty()) {
@@ -103,7 +103,7 @@ public class SubListAdapter extends RecyclerView.Adapter<SubListAdapter.ViewHold
                     relativeLayoutVideoPost.setVisibility(View.INVISIBLE);
                     relativeLayoutImagePost.setVisibility(View.VISIBLE);
                     textViewImagePostName.setText(item.getName());
-                    textViewImagePostDate.setText(item.getDate());
+                    textViewImagePostDate.setText(item.getDateFormated());
 
                     Picasso.get().setLoggingEnabled(true);
                     Picasso.get()
@@ -119,7 +119,7 @@ public class SubListAdapter extends RecyclerView.Adapter<SubListAdapter.ViewHold
                     relativeLayoutImagePost.setVisibility(View.INVISIBLE);
                     relativeLayoutVideoPost.setVisibility(View.VISIBLE);
                     textViewVideoPostName.setText(item.getName());
-                    textViewVideoPostDate.setText(item.getDate());
+                    textViewVideoPostDate.setText(item.getDateFormated());
 
                     DataSource.Factory dataSourceFactory = new DefaultDataSourceFactory(mContext,
                             Util.getUserAgent(mContext, "yourApplicationName"));

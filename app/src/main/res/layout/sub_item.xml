@@ -123,7 +123,8 @@
             android:layout_below="@+id/textViewImagePostName"
             android:text="PostDate"
             android:textColor="@color/white"
-            android:textSize="18sp" />
+            android:textSize="18sp"
+            android:textStyle="italic" />
     </RelativeLayout>
 
     <RelativeLayout
@@ -163,7 +164,8 @@
             android:layout_marginTop="0dp"
             android:text="PostDate"
             android:textColor="@color/white"
-            android:textSize="18sp" />
+            android:textSize="18sp"
+            android:textStyle="italic" />
 
     </RelativeLayout>
 

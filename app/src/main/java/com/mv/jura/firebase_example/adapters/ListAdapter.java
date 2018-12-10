@@ -157,6 +157,7 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder>{
                 if (task.isSuccessful()){
                     DocumentSnapshot doc = task.getResult();
                     item.setRegistrationDate(((Timestamp)doc.get("date")).toDate().toString());
+                    item.setRegistrationDateObject(((Timestamp)doc.get("date")).toDate());
                     item.setName(doc.getString("username"));
                     item.setPostCount(doc.get("numberOfPosts").toString());
                     item.setProfile(true);
@@ -185,7 +186,7 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder>{
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
                 if (task.isSuccessful()) {
                     for (QueryDocumentSnapshot doc : task.getResult()) {
-                        items.add(1,new Item( doc.getString("username"), null, ((Timestamp)doc.get("date")).toDate().toString(), null,doc.get("imageurl").toString(),doc.get("videourl").toString(),false));
+                        items.add(1,new Item( doc.getString("username"), null, ((Timestamp)doc.get("date")).toDate().toString(),((Timestamp) doc.get("date")).toDate(), null,doc.get("imageurl").toString(),doc.get("videourl").toString(),false));
                     }
 
                     loadedChecker.setPostsLoaded(true);
