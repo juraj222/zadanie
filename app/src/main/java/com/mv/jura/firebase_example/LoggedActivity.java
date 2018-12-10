@@ -195,4 +195,12 @@ public class LoggedActivity extends AppCompatActivity {
         snapHelper.attachToRecyclerView(mRecyclerView);
         loaded = true;
     }
+
+    @Override
+    public void onBackPressed() {
+        items.clear();
+        userId = null;
+        startActivity(new Intent(LoggedActivity.this, LoginActivity.class));
+        super.onBackPressed();
+    }
 }
